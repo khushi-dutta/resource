@@ -55,17 +55,30 @@ st.markdown("""
 def load_disaster_model():
     """Load the trained disaster prediction model"""
     try:
-        model = DisasterPredictionModel(r"c:\Clg projects\SIH\public_emdat_custom_request_2025-09-23_a3fd530f-e94c-4921-85e6-df85a531b149.csv")
+        # Use the CSV file in the current directory
+        csv_file = "public_emdat_custom_request_2025-09-23_a3fd530f-e94c-4921-85e6-df85a531b149.csv"
+        
+        if not os.path.exists(csv_file):
+            st.error(f"Data file {csv_file} not found. Please ensure the CSV file is in the app directory.")
+            return None, False
+            
+        model = DisasterPredictionModel(csv_file)
         
         # Check if saved model exists
         if os.path.exists("disaster_prediction_model.pkl"):
-            model.load_model("disaster_prediction_model.pkl")
-            return model, True
+            try:
+                model.load_model("disaster_prediction_model.pkl")
+                return model, True
+            except Exception as load_error:
+                st.warning(f"Could not load saved model ({str(load_error)}). Training new model...")
+                # Fall back to training a new model
+                model.load_and_preprocess_data()
+                model.train_models_safe()  # Use safer training method
+                return model, False
         else:
             # Train model if not saved
             model.load_and_preprocess_data()
-            model.train_models()
-            model.save_model("disaster_prediction_model.pkl")
+            model.train_models_safe()  # Use safer training method
             return model, False
     except Exception as e:
         st.error(f"Error loading model: {str(e)}")
