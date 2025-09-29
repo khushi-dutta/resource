@@ -56,4 +56,32 @@ You can also use the newer Streamlit Community Cloud at [streamlit.io/cloud](htt
 - Large data files are handled efficiently
 - UI is optimized for web deployment
 
+## 🔧 Troubleshooting
+
+### Common Issues and Solutions:
+
+1. **IndexError during model loading**
+   - The app now uses safe training mode without neural networks
+   - Fallback predictions available if models fail
+   - Compatible with various TensorFlow versions
+
+2. **File path issues**
+   - All hardcoded paths have been removed
+   - App looks for data files in the same directory
+
+3. **Package installation errors**
+   - Removed problematic packages.txt file
+   - Using Python 3.9 for better compatibility
+
+### Health Check
+Run the diagnostic script locally:
+```bash
+python health_check.py
+```
+
+This will verify:
+- All required files are present
+- All dependencies can be imported
+- Model can be loaded successfully
+
 Your app is ready for deployment! 🎉
