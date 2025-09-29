@@ -766,15 +766,18 @@ class DisasterPredictionModel:
         return predictions
     
     def save_model(self, filepath):
-        """Save the trained model and preprocessors"""
+        """Save the trained model and preprocessors (excluding neural networks for compatibility)"""
+        # Filter out neural network models to avoid TensorFlow compatibility issues
+        safe_models = {k: v for k, v in self.models.items() if k != 'neural_network'}
+        
         model_data = {
-            'models': self.models,
+            'models': safe_models,
             'encoders': self.encoders,
             'scalers': self.scalers,
             'state_areas': self.state_areas
         }
         joblib.dump(model_data, filepath)
-        print(f"Model saved to {filepath}")
+        print(f"Model saved to {filepath} (excluding neural network for compatibility)")
     
     def load_model(self, filepath):
         """Load a trained model and preprocessors"""

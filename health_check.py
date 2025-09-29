@@ -11,9 +11,12 @@ def check_files():
     required_files = [
         'streamlit_app.py',
         'disaster_prediction_model.py',
-        'disaster_prediction_model.pkl',
         'public_emdat_custom_request_2025-09-23_a3fd530f-e94c-4921-85e6-df85a531b149.csv',
         'requirements.txt'
+    ]
+    
+    optional_files = [
+        'disaster_prediction_model.pkl'
     ]
     
     print("=== FILE CHECK ===")
@@ -25,6 +28,14 @@ def check_files():
         else:
             print(f"❌ {file} - MISSING")
             all_files_exist = False
+    
+    # Check optional files
+    for file in optional_files:
+        if os.path.exists(file):
+            size = os.path.getsize(file)
+            print(f"📦 {file} ({size:,} bytes) - Optional")
+        else:
+            print(f"⚠️  {file} - Will be created on first run")
     
     return all_files_exist
 
@@ -69,10 +80,13 @@ def check_model():
         model = DisasterPredictionModel(csv_file)
         
         if os.path.exists("disaster_prediction_model.pkl"):
-            model.load_model("disaster_prediction_model.pkl")
-            print("✅ Pre-trained model loaded successfully")
+            try:
+                model.load_model("disaster_prediction_model.pkl")
+                print("✅ Pre-trained model loaded successfully")
+            except Exception as e:
+                print(f"⚠️  Pre-trained model found but couldn't load ({e}) - will train fresh")
         else:
-            print("⚠️  No pre-trained model found - will train on startup")
+            print("✅ No pre-trained model found - will train fresh for optimal compatibility")
         
         print("✅ Model class initialized successfully")
         return True

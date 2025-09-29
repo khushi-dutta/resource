@@ -51,7 +51,6 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-@st.cache_data
 def load_disaster_model():
     """Load the trained disaster prediction model"""
     try:
@@ -64,22 +63,13 @@ def load_disaster_model():
             
         model = DisasterPredictionModel(csv_file)
         
-        # Check if saved model exists
-        if os.path.exists("disaster_prediction_model.pkl"):
-            try:
-                model.load_model("disaster_prediction_model.pkl")
-                return model, True
-            except Exception as load_error:
-                st.warning(f"Could not load saved model ({str(load_error)}). Training new model...")
-                # Fall back to training a new model
-                model.load_and_preprocess_data()
-                model.train_models_safe()  # Use safer training method
-                return model, False
-        else:
-            # Train model if not saved
-            model.load_and_preprocess_data()
-            model.train_models_safe()  # Use safer training method
-            return model, False
+        # Always train fresh model in safe mode for cloud deployment
+        # This avoids TensorFlow compatibility issues with cached models
+        st.info("Training models for optimal cloud performance...")
+        model.load_and_preprocess_data()
+        model.train_models_safe()  # Use safer training method
+        return model, True
+        
     except Exception as e:
         st.error(f"Error loading model: {str(e)}")
         return None, False
