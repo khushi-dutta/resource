@@ -4,13 +4,14 @@ A comprehensive machine learning system for predicting natural disaster casualti
 
 ## 🎯 Features
 
-- **Multi-Model Prediction**: Uses Random Forest, XGBoost, and Neural Networks for robust predictions
+- **Multi-Model Prediction**: Uses Random Forest and XGBoost for robust predictions (Neural Networks in local environments)
 - **Location-Based Analysis**: Predicts casualties for specific Indian states
 - **Severity Assessment**: 5-level severity scale for disaster impact
-- **Interactive Web Interface**: User-friendly Streamlit application
+- **Interactive Web Interface**: User-friendly Streamlit application deployed on cloud
 - **Command Line Interface**: Quick predictions via CLI
 - **Historical Analysis**: Comprehensive analysis of past disasters
 - **Emergency Recommendations**: Actionable response suggestions
+- **Cloud Deployment Ready**: Optimized for Streamlit Cloud with automatic compatibility detection
 
 ## 📊 Prediction Outputs
 
@@ -28,15 +29,20 @@ The system predicts:
 - pip package manager
 
 ### Setup
-1. Clone or download the project files
-2. Navigate to the project directory:
+1. Clone the repository:
    ```bash
-   cd "c:\Clg projects\SIH"
+   git clone https://github.com/khushi-dutta/resource.git
+   cd resource
    ```
 
-3. Install required packages:
+2. Install required packages:
    ```bash
    pip install -r requirements.txt
+   ```
+
+3. Run health check (optional):
+   ```bash
+   python health_check.py
    ```
 
 ## 🚀 Usage
@@ -50,7 +56,9 @@ streamlit run streamlit_app.py
 Then open your browser to `http://localhost:8501`
 
 ### 🌐 Live Demo
-The application is deployed on Streamlit Cloud and available at: [India Disaster Prediction System](https://your-app-url.streamlit.app)
+The application is deployed on Streamlit Cloud and available at: [India Disaster Prediction System](https://resource-hcncmfy4m5ekvrtrodzfxh.streamlit.app/)
+
+> **Note**: First load may take 30-60 seconds as the model trains fresh for optimal cloud compatibility.
 
 #### Web Interface Features:
 - **Parameter Selection**: Choose state, disaster type, area, and severity
@@ -193,10 +201,11 @@ The system uses three complementary ML models:
 - **Strengths**: Handles missing data, prevents overfitting
 - **Parameters**: 200 estimators, learning rate 0.1
 
-### 3. Neural Network
+### 3. Neural Network (Local Environment Only)
 - **Purpose**: Deep learning for complex patterns
 - **Architecture**: 4 layers (128→64→32→3 neurons)
 - **Features**: Dropout, batch normalization, early stopping
+- **Note**: Automatically disabled on cloud deployments for compatibility
 
 ### Ensemble Prediction
 The final prediction combines all three models using averaging for robust results.
@@ -210,7 +219,64 @@ The model is trained on the **EM-DAT (Emergency Events Database)** dataset conta
 - **Records**: 400+ disaster events
 - **Variables**: 40+ features including casualties, damage, location, magnitude
 
-## 🔧 Customization
+## � Deployment
+
+### Streamlit Cloud Deployment
+The app is optimized for Streamlit Cloud deployment:
+
+1. **Fork the repository** on GitHub
+2. **Connect to Streamlit Cloud** at [share.streamlit.io](https://share.streamlit.io)
+3. **Deploy** by selecting your repository and `streamlit_app.py`
+4. **Automatic optimization** detects cloud environment and adjusts accordingly
+
+### Local Development
+```bash
+# Quick start
+streamlit run streamlit_app.py
+
+# With custom port
+streamlit run streamlit_app.py --server.port 8502
+
+# Health check first
+python health_check.py
+streamlit run streamlit_app.py
+```
+
+### Environment Detection
+The app automatically detects deployment environment and:
+- **Local**: Uses all models including neural networks
+- **Cloud**: Skips neural networks for compatibility
+- **Fallback**: Provides basic predictions if model training fails
+
+## 🔧 Troubleshooting
+
+### Common Issues
+
+#### "DisasterPredictionModel has no attribute 'train_models_safe'"
+- **Solution**: Update to latest version from GitHub
+- **Cause**: Old cached version of code
+
+#### "IndexError during model loading"
+- **Solution**: Fresh training will resolve TensorFlow compatibility
+- **Cause**: Neural network version conflicts
+
+#### App takes long to load
+- **Expected**: First load trains models fresh (30-60 seconds)
+- **Optimization**: Models are cached after first successful training
+
+### Health Check
+Run diagnostics before deployment:
+```bash
+python health_check.py
+```
+
+This checks:
+- ✅ Required files present
+- ✅ Dependencies installed
+- ✅ Model can be loaded
+- ✅ Training works correctly
+
+## �🔧 Customization
 
 ### Adding New States/Regions
 Update the `state_areas` dictionary in `disaster_prediction_model.py`:
@@ -383,5 +449,6 @@ This project is developed for the Smart India Hackathon (SIH) and is intended fo
 
 ---
 
-**Built with ❤️ for India's disaster resilience**#   r e s o u r c e  
+**Built with ❤️ for India's disaster resilience**#   r e s o u r c e 
+ 
  
