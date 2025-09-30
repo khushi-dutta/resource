@@ -21,6 +21,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+import os
 from sklearn.model_selection import train_test_split, cross_val_score, GridSearchCV
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.preprocessing import LabelEncoder, StandardScaler, RobustScaler
@@ -518,23 +519,37 @@ class DisasterPredictionModel:
         xgb_model.fit(X_train, y_train)
         self.models['xgboost'] = xgb_model
         
-        # Train Neural Network
-        print("Training Neural Network...")
-        nn_model = self._build_neural_network(X_train.shape[1], y_train.shape[1])
-        
-        # Callbacks
-        early_stopping = EarlyStopping(patience=20, restore_best_weights=True)
-        reduce_lr = ReduceLROnPlateau(patience=10, factor=0.5, min_lr=1e-6)
-        
-        nn_model.fit(
-            X_train, y_train,
-            epochs=100,
-            batch_size=32,
-            validation_split=0.2,
-            callbacks=[early_stopping, reduce_lr],
-            verbose=0
-        )
-        self.models['neural_network'] = nn_model
+        # Train Neural Network (skip in cloud environments for compatibility)
+        try:
+            # Check if we're running on Streamlit Cloud (various environment indicators)
+            is_cloud = any([
+                os.getenv('STREAMLIT_CLOUD') == 'true',
+                os.getenv('HOSTNAME', '').startswith('streamlit'),
+                '/mount/src/' in os.getcwd(),
+                'adminuser' in os.path.expanduser('~')
+            ])
+            
+            if TENSORFLOW_AVAILABLE and not is_cloud:
+                print("Training Neural Network...")
+                nn_model = self._build_neural_network(X_train.shape[1], y_train.shape[1])
+                
+                # Callbacks
+                early_stopping = EarlyStopping(patience=20, restore_best_weights=True)
+                reduce_lr = ReduceLROnPlateau(patience=10, factor=0.5, min_lr=1e-6)
+                
+                nn_model.fit(
+                    X_train, y_train,
+                    epochs=100,
+                    batch_size=32,
+                    validation_split=0.2,
+                    callbacks=[early_stopping, reduce_lr],
+                    verbose=0
+                )
+                self.models['neural_network'] = nn_model
+            else:
+                print("Skipping Neural Network training for cloud compatibility...")
+        except Exception as e:
+            print(f"Neural Network training failed ({e}), continuing with other models...")
         
         # Evaluate models
         self._evaluate_models(X_test, y_test)

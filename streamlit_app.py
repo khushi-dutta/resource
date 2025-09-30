@@ -63,11 +63,11 @@ def load_disaster_model():
             
         model = DisasterPredictionModel(csv_file)
         
-        # Always train fresh model in safe mode for cloud deployment
+        # Always train fresh model for cloud deployment
         # This avoids TensorFlow compatibility issues with cached models
         st.info("Training models for optimal cloud performance...")
         model.load_and_preprocess_data()
-        model.train_models_safe()  # Use safer training method
+        model.train_models()  # Will skip neural network in cloud environment
         return model, True
         
     except Exception as e:
